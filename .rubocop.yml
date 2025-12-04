@@ -1,0 +1,20 @@
+AllCops:
+  NewCops: enable
+
+Lint/MissingCopEnableDirective:
+  Enabled: false
+
+Metrics/AbcSize:
+  Max: 25
+
+Metrics/CyclomaticComplexity:
+  Max: 10
+
+Metrics/MethodLength:
+  Max: 20
+
+Naming/MethodParameterName:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
