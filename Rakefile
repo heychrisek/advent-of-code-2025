@@ -29,8 +29,13 @@ task :day, [:day] do |_t, args|
 end
 
 desc "Generate a new day's solution"
-task :new do
-  day = (Dir['d*.rb'].map { |x| x[1..2] }.max.to_i + 1).to_s.rjust(2, '0')
+task :new, [:day] do |_t, args|
+  day = if args[:day].nil?
+          (Dir['d*.rb'].map { |x| x[1..2] }.max.to_i + 1).to_s.rjust(2, '0')
+        else
+          Integer(args[:day]).to_s.rjust(2, '0')
+        end
+
   solver = File.read('d00.rb').gsub('00', day)
   tester = File.read('d00_test.rb').gsub('00', day)
   File.write("d#{day}.rb", solver)
