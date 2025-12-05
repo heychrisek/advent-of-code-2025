@@ -5,7 +5,7 @@ require_relative 'd04'
 
 class TestD04 < Minitest::Test
   def setup
-    @example = <<~EXAMPLE
+    @input = <<~INPUT
       ..@@.@@@@.
       @@@.@.@.@@
       @@@@@.@.@@
@@ -16,14 +16,14 @@ class TestD04 < Minitest::Test
       @.@@@.@@@@
       .@@@@@@@@.
       @.@.@@@.@.
-    EXAMPLE
+    INPUT
   end
 
   def test_part1
-    assert_equal 13, D04.new(@example).part1
+    assert_equal 13, D04.new(@input).part1
   end
 
   def test_part2
-    assert_equal 43, D04.new(@example).part2
+    assert_equal 43, D04.new(@input).part2
   end
 end
