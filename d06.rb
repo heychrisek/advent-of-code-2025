@@ -29,7 +29,7 @@ class D06
   def parse2
     lines = @input.strip.split("\n")
     @operators = lines.last.split
-    transposed_chars = lines[0..-2].map { |l| l.split('') }.transpose
+    transposed_chars = lines[0..-2].map(&:chars).transpose
     @nums = transposed_chars
             .chunk { |row| row.all? { |c| c == ' ' } }
             .reject { |is_separator, _| is_separator }
