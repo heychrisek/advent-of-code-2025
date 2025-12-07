@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'pry'
-
 class D07
   def initialize(input)
     @input = input
@@ -9,48 +7,52 @@ class D07
 
   def part1
     parse
-    @count = 0
-    i = @rows[0].index('S')
-    count_splits(1, i)
-    @count
+    start_col = @rows[0].index('S')
+    count_splits(1, start_col)
   end
 
   def part2
     parse
-    i = @rows[0].index('S')
-    count_timelines(1, i, {})
+    start_col = @rows[0].index('S')
+    count_timelines(1, start_col)
   end
 
-  def count_splits(row_i, col_i)
-    return if row_i >= @rows.length || col_i >= @rows[row_i].length || row_i.negative? || col_i.negative?
+  private
 
-    if @rows[row_i][col_i] == '^'
+  def count_splits(row_i, col_i)
+    return 0 if out_of_bounds?(row_i, col_i)
+
+    case @rows[row_i][col_i]
+    when '^'
       @rows[row_i][col_i] = '*'
-      @count += 1
-      count_splits(row_i, col_i - 1)
-      count_splits(row_i, col_i + 1)
-    elsif @rows[row_i][col_i] == '.'
+      1 + count_splits(row_i, col_i - 1) + count_splits(row_i, col_i + 1)
+    when '.'
       @rows[row_i][col_i] = '|'
       count_splits(row_i + 1, col_i)
+    else
+      0
     end
   end
 
-  # rubocop:disable Metrics/PerceivedComplexity
-  def count_timelines(row_i, col_i, memo)
-    return 1 if row_i >= @rows.length || col_i >= @rows[row_i].length || row_i.negative? || col_i.negative?
+  def count_timelines(row_i, col_i, memo = {})
+    return 1 if out_of_bounds?(row_i, col_i)
 
     key = [row_i, col_i]
     return memo[key] if memo.key?(key)
 
-    memo[key] = if @rows[row_i][col_i] == '^'
+    memo[key] = case @rows[row_i][col_i]
+                when '^'
                   count_timelines(row_i, col_i - 1, memo) + count_timelines(row_i, col_i + 1, memo)
-                elsif @rows[row_i][col_i] == '.'
+                when '.'
                   count_timelines(row_i + 1, col_i, memo)
                 else
                   0
                 end
   end
-  # rubocop:enable Metrics/PerceivedComplexity
+
+  def out_of_bounds?(row_i, col_i)
+    row_i.negative? || col_i.negative? || row_i >= @rows.size || col_i >= @rows[row_i].size
+  end
 
   def parse
     @rows = @input.strip.split("\n")
