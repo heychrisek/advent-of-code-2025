@@ -1,5 +1,17 @@
 # frozen_string_literal: true
 
+# Part 2 uses a Python ILP solver (scipy) for performance.
+# To set up the Python environment:
+#
+#   python3 -m venv .venv
+#   source .venv/bin/activate
+#   pip install scipy numpy
+#
+# The Ruby code will automatically use .venv/bin/python3 if it exists.
+
+require 'json'
+require 'open3'
+
 class D10
   def initialize(input)
     @input = input
@@ -39,32 +51,36 @@ class D10
     min
   end
 
-  # rubocop:disable Metrics
   def min_presses_for_joltage(row)
     target = row[:joltage][:target]
     buttons = row[:buttons]
-    min = nil
 
-    max_presses_per_button = buttons.map do |button_counters|
-      button_counters.map { |counter| target[counter] }.min
+    # Build incidence matrix A where A[i][j] = 1 if button j affects counter i
+    a_data = Array.new(target.size) { Array.new(buttons.size, 0) }
+    buttons.each_with_index do |counters, j|
+      counters.each { |i| a_data[i][j] = 1 }
     end
 
-    ranges = max_presses_per_button.map { |max| (0..max).to_a }
-    ranges[0].product(*ranges[1..]).each do |press_counts|
-      state = [0] * target.size
-      total_presses = 0
-
-      press_counts.each_with_index do |times, button_idx|
-        total_presses += times
-        buttons[button_idx].each { |counter| state[counter] += times }
-      end
-
-      min = total_presses if state == target && (min.nil? || total_presses < min)
-    end
-
-    min
+    solve_with_python_ilp(a_data, target)
   end
-  # rubocop:enable Metrics
+
+  # Solve using Python scipy.optimize.milp (Integer Linear Programming)
+  def solve_with_python_ilp(a_data, target)
+    input = JSON.generate({ A: a_data, target: target })
+    script_path = File.join(__dir__, 'd10_solve_ilp.py')
+
+    # Use venv python if available, otherwise system python3
+    venv_python = File.join(__dir__, '.venv', 'bin', 'python3')
+    python_cmd = File.exist?(venv_python) ? venv_python : 'python3'
+
+    stdout, _stderr, status = Open3.capture3(python_cmd, script_path, stdin_data: input)
+    raise 'Python ILP solver failed' unless status.success?
+
+    result = JSON.parse(stdout)
+    raise result['error'] if result['error']
+
+    result['result']
+  end
 
   # rubocop:disable Metrics/AbcSize
   def parse
