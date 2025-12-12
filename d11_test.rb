@@ -4,6 +4,7 @@ require 'minitest/autorun'
 require_relative 'd11'
 
 class TestD11 < Minitest::Test
+  # rubocop:disable Metrics/MethodLength
   def setup
     @input1 = <<~INPUT
       aaa: you hhh
@@ -34,6 +35,7 @@ class TestD11 < Minitest::Test
       hhh: out
     INPUT
   end
+  # rubocop:enable Metrics/MethodLength
 
   def test_part1
     assert_equal 5, D11.new(@input1).part1

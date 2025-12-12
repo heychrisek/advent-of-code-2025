@@ -20,9 +20,9 @@ class D09
     parse
     build_edges
     build_candidate_rectangles
-    warn "Parsed #{@coords.length} coordinates, #{@edges.length} edges"
-    warn "Generated #{@candidate_rectangles.length} candidate_rectangles, " \
-         "largest area: #{@candidate_rectangles.first[0]}"
+    # warn "Parsed #{@coords.length} coordinates, #{@edges.length} edges"
+    # warn "Generated #{@candidate_rectangles.length} candidate_rectangles, " \
+    #      "largest area: #{@candidate_rectangles.first[0]}"
 
     find_first_valid_rectangle
   end
@@ -55,8 +55,8 @@ class D09
   end
 
   def find_first_valid_rectangle
-    @candidate_rectangles.each_with_index do |(area, min_x, min_y, max_x, max_y), i|
-      warn "Checking box #{i}: area=#{area}" if (i % 10_000).zero?
+    @candidate_rectangles.each_with_index do |(area, min_x, min_y, max_x, max_y), _i|
+      # warn "Checking box #{i}: area=#{area}" if (i % 10_000).zero?
       return area if valid_rectangle?(min_x, min_y, max_x, max_y)
     end
   end
